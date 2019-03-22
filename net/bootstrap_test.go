@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"gx/ipfs/QmPVkJMTeRC6iBByPWdrRkD3BE5UXsj5HPzb4kPqL186mS/testify/assert"
 	pstore "gx/ipfs/QmRhFARzTHcFh8wUxwN5KvyTGq73FLC65EfFAhz8Ng7aGb/go-libp2p-peerstore"
-	peer "gx/ipfs/QmTu65MVbemtUxJEWgsTtzv9Zv9P8rvmqNA4eG9TrTRGYc/go-libp2p-peer"
+	"gx/ipfs/QmTu65MVbemtUxJEWgsTtzv9Zv9P8rvmqNA4eG9TrTRGYc/go-libp2p-peer"
 	offroute "gx/ipfs/QmcjqHcsk8E1Gd8RbuaUawWC7ogDtaVcdjLvZF8ysCCiPn/go-ipfs-routing/offline"
 
 	"github.com/filecoin-project/go-filecoin/repo"
-
-	"gx/ipfs/QmPVkJMTeRC6iBByPWdrRkD3BE5UXsj5HPzb4kPqL186mS/testify/assert"
+	th "github.com/filecoin-project/go-filecoin/testhelpers"
 )
 
 func nopConnect(context.Context, pstore.PeerInfo) error   { return nil }
@@ -27,8 +27,8 @@ func (blankValidator) Select(_ string, _ [][]byte) (int, error) { return 0, nil 
 
 func TestBootstrapperStartAndStop(t *testing.T) {
 	assert := assert.New(t)
-	fakeHost := &fakeHost{ConnectImpl: nopConnect}
-	fakeDialer := &fakeDialer{PeersImpl: nopPeers}
+	fakeHost := &th.FakeHost{ConnectImpl: nopConnect}
+	fakeDialer := &th.FakeDialer{PeersImpl: nopPeers}
 	fakeRouter := offroute.NewOfflineRouter(repo.NewInMemoryRepo().Datastore(), blankValidator{})
 
 	// Check that Start() causes Bootstrap() to be periodically called and
@@ -66,8 +66,8 @@ func TestBootstrapperStartAndStop(t *testing.T) {
 func TestBootstrapperBootstrap(t *testing.T) {
 	t.Run("Doesn't connect if already have enough peers", func(t *testing.T) {
 		assert := assert.New(t)
-		fakeHost := &fakeHost{ConnectImpl: panicConnect}
-		fakeDialer := &fakeDialer{PeersImpl: panicPeers}
+		fakeHost := &th.FakeHost{ConnectImpl: panicConnect}
+		fakeDialer := &th.FakeDialer{PeersImpl: panicPeers}
 		fakeRouter := offroute.NewOfflineRouter(repo.NewInMemoryRepo().Datastore(), blankValidator{})
 		ctx := context.Background()
 
@@ -88,11 +88,11 @@ func TestBootstrapperBootstrap(t *testing.T) {
 
 	t.Run("Connects if don't have enough peers", func(t *testing.T) {
 		assert := assert.New(t)
-		fakeHost := &fakeHost{ConnectImpl: countingConnect}
+		fakeHost := &th.FakeHost{ConnectImpl: countingConnect}
 		lk.Lock()
 		connectCount = 0
 		lk.Unlock()
-		fakeDialer := &fakeDialer{PeersImpl: panicPeers}
+		fakeDialer := &th.FakeDialer{PeersImpl: panicPeers}
 		fakeRouter := offroute.NewOfflineRouter(repo.NewInMemoryRepo().Datastore(), blankValidator{})
 
 		bootstrapPeers := []pstore.PeerInfo{
@@ -111,11 +111,11 @@ func TestBootstrapperBootstrap(t *testing.T) {
 
 	t.Run("Doesn't try to connect to an already connected peer", func(t *testing.T) {
 		assert := assert.New(t)
-		fakeHost := &fakeHost{ConnectImpl: countingConnect}
+		fakeHost := &th.FakeHost{ConnectImpl: countingConnect}
 		lk.Lock()
 		connectCount = 0
 		lk.Unlock()
-		fakeDialer := &fakeDialer{PeersImpl: panicPeers}
+		fakeDialer := &th.FakeDialer{PeersImpl: panicPeers}
 		fakeRouter := offroute.NewOfflineRouter(repo.NewInMemoryRepo().Datastore(), blankValidator{})
 
 		connectedPeerID := requireRandPeerID(t)
