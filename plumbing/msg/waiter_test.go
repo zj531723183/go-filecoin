@@ -74,7 +74,7 @@ func testWaitExisting(ctx context.Context, t *testing.T, cst *hamt.CborIpldStore
 	require.Equal(t, 1, len(ts))
 	th.RequirePutTsas(ctx, t, chainStore, &chain.TipSetAndState{
 		TipSet:          ts,
-		TipSetStateRoot: ts.ToSlice()[0].StateRoot,
+		TipSetStateRoot: types.SomeCid(),
 	})
 	require.NoError(t, chainStore.SetHead(ctx, ts))
 
@@ -101,7 +101,7 @@ func testWaitNew(ctx context.Context, t *testing.T, cst *hamt.CborIpldStore, cha
 	require.Equal(t, 1, len(ts))
 	th.RequirePutTsas(ctx, t, chainStore, &chain.TipSetAndState{
 		TipSet:          ts,
-		TipSetStateRoot: ts.ToSlice()[0].StateRoot,
+		TipSetStateRoot: types.SomeCid(),
 	})
 	require.NoError(t, chainStore.SetHead(ctx, ts))
 
