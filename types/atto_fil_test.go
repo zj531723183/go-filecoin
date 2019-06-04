@@ -57,8 +57,8 @@ func TestZeroAttoFIL(t *testing.T) {
 	z := NewAttoFILFromFIL(0)
 
 	assert.Equal(t, z, ZeroAttoFIL)
-	assert.True(t, z.Equal(nil))
-	assert.True(t, ZeroAttoFIL.Equal(nil))
+	//assert.True(t, z.Equal(nil))
+	//assert.True(t, ZeroAttoFIL.Equal(nil))
 }
 
 func TestAttoFILComparison(t *testing.T) {
@@ -83,17 +83,17 @@ func TestAttoFILComparison(t *testing.T) {
 		assert.True(t, a.LessEqual(b))
 	})
 
-	t.Run("treats nil pointers as zero", func(t *testing.T) {
-		d := ZeroAttoFIL.Sub(a)
-		var np *AttoFIL
-
-		assert.True(t, np.Equal(ZeroAttoFIL))
-		assert.True(t, ZeroAttoFIL.Equal(np))
-		assert.True(t, d.LessThan(np))
-		assert.True(t, np.GreaterThan(d))
-		assert.True(t, c.GreaterThan(np))
-		assert.True(t, np.LessThan(c))
-	})
+	//t.Run("treats nil pointers as zero", func(t *testing.T) {
+	//	d := ZeroAttoFIL.Sub(a)
+	//	var np *AttoFIL
+	//
+	//	assert.True(t, np.Equal(ZeroAttoFIL))
+	//	assert.True(t, ZeroAttoFIL.Equal(np))
+	//	assert.True(t, d.LessThan(np))
+	//	assert.True(t, np.GreaterThan(d))
+	//	assert.True(t, c.GreaterThan(np))
+	//	assert.True(t, np.LessThan(c))
+	//})
 }
 
 func TestAttoFILAddition(t *testing.T) {
@@ -118,15 +118,15 @@ func TestAttoFILAddition(t *testing.T) {
 		assert.Equal(t, bStr, b.String())
 	})
 
-	t.Run("treats nil pointers as zero", func(t *testing.T) {
-		var x, z *AttoFIL
-
-		assert.True(t, z.Add(a).Equal(a))
-		assert.True(t, a.Add(z).Equal(a))
-		assert.True(t, a.Add(nil).Equal(a))
-		assert.True(t, z.Add(x).Equal(nil))
-		assert.True(t, z.Add(nil).Equal(x))
-	})
+	//t.Run("treats nil pointers as zero", func(t *testing.T) {
+	//	var x, z *AttoFIL
+	//
+	//	assert.True(t, z.Add(a).Equal(a))
+	//	assert.True(t, a.Add(z).Equal(a))
+	//	assert.True(t, a.Add(nil).Equal(a))
+	//	assert.True(t, z.Add(x).Equal(nil))
+	//	assert.True(t, z.Add(nil).Equal(x))
+	//})
 }
 
 func TestAttoFILSubtraction(t *testing.T) {
@@ -151,14 +151,14 @@ func TestAttoFILSubtraction(t *testing.T) {
 		assert.Equal(t, bStr, b.String())
 	})
 
-	t.Run("treats nil pointers as zero", func(t *testing.T) {
-		var z *AttoFIL
-
-		assert.True(t, a.Sub(z).Equal(a))
-		assert.True(t, a.Sub(nil).Equal(a))
-		assert.True(t, z.Sub(z).Equal(z))
-		assert.True(t, z.Sub(nil).Equal(nil))
-	})
+	//t.Run("treats nil pointers as zero", func(t *testing.T) {
+	//	var z *AttoFIL
+	//
+	//	assert.True(t, a.Sub(z).Equal(a))
+	//	assert.True(t, a.Sub(nil).Equal(a))
+	//	assert.True(t, z.Sub(z).Equal(z))
+	//	assert.True(t, z.Sub(nil).Equal(nil))
+	//})
 }
 
 func TestMulInt(t *testing.T) {
@@ -179,12 +179,12 @@ func TestDivCeil(t *testing.T) {
 	x := AttoFIL{val: big.NewInt(200)}
 
 	t.Run("returns exactly the dividend when y divides x", func(t *testing.T) {
-		actual := x.DivCeil(&AttoFIL{val: big.NewInt(10)})
+		actual := x.DivCeil(AttoFIL{val: big.NewInt(10)})
 		assert.Equal(t, NewAttoFIL(big.NewInt(20)), actual)
 	})
 
 	t.Run("rounds up when y does not divide x", func(t *testing.T) {
-		actual := x.DivCeil(&AttoFIL{val: big.NewInt(9)})
+		actual := x.DivCeil(AttoFIL{val: big.NewInt(9)})
 		assert.Equal(t, NewAttoFIL(big.NewInt(23)), actual)
 	})
 }
@@ -211,15 +211,15 @@ func TestPriceCalculation(t *testing.T) {
 		assert.Equal(t, numBytesStr, numBytes.String())
 	})
 
-	t.Run("treats nil pointers as zero", func(t *testing.T) {
-		var nt *AttoFIL
-		var nb *BytesAmount
-
-		assert.Equal(t, price.CalculatePrice(nil), ZeroAttoFIL)
-		assert.Equal(t, nt.CalculatePrice(numBytes), ZeroAttoFIL)
-		assert.Equal(t, price.CalculatePrice(nb), ZeroAttoFIL)
-		assert.Equal(t, nt.CalculatePrice(nb), ZeroAttoFIL)
-	})
+	//t.Run("treats nil pointers as zero", func(t *testing.T) {
+	//	var nt *AttoFIL
+	//	var nb *BytesAmount
+	//
+	//	assert.Equal(t, price.CalculatePrice(nil), ZeroAttoFIL)
+	//	assert.Equal(t, nt.CalculatePrice(numBytes), ZeroAttoFIL)
+	//	assert.Equal(t, price.CalculatePrice(nb), ZeroAttoFIL)
+	//	assert.Equal(t, nt.CalculatePrice(nb), ZeroAttoFIL)
+	//})
 }
 
 func TestAttoFILCborMarshaling(t *testing.T) {
@@ -238,7 +238,7 @@ func TestAttoFILCborMarshaling(t *testing.T) {
 			err = cbor.DecodeInto(out, &postDecode)
 			assert.NoError(t, err)
 
-			assert.True(t, preEncode.Equal(&postDecode), "pre: %s post: %s", preEncode.String(), postDecode.String())
+			assert.True(t, preEncode.Equal(postDecode), "pre: %s post: %s", preEncode.String(), postDecode.String())
 		}
 	})
 	t.Run("cannot CBOR encode nil as *AttoFIL", func(t *testing.T) {
@@ -270,7 +270,7 @@ func TestAttoFILJsonMarshaling(t *testing.T) {
 			err = json.Unmarshal(marshaled, &unmarshaled)
 			assert.NoError(t, err)
 
-			assert.True(t, toBeMarshaled.Equal(&unmarshaled), "should be equal - toBeMarshaled: %s unmarshaled: %s)", toBeMarshaled.String(), unmarshaled.String())
+			assert.True(t, toBeMarshaled.Equal(unmarshaled), "should be equal - toBeMarshaled: %s unmarshaled: %s)", toBeMarshaled.String(), unmarshaled.String())
 		}
 	})
 
@@ -284,7 +284,7 @@ func TestAttoFILJsonMarshaling(t *testing.T) {
 		err = json.Unmarshal(marshaled, &unmarshaled)
 		assert.NoError(t, err)
 
-		assert.True(t, toBeMarshaled.Equal(&unmarshaled), "should be equal - toBeMarshaled: %s unmarshaled: %s)", toBeMarshaled.String(), unmarshaled.String())
+		assert.True(t, toBeMarshaled.Equal(unmarshaled), "should be equal - toBeMarshaled: %s unmarshaled: %s)", toBeMarshaled.String(), unmarshaled.String())
 	})
 
 	t.Run("cannot JSON marshall nil as *AttoFIL", func(t *testing.T) {
