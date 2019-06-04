@@ -32,7 +32,7 @@ func TestAttoFILCreation(t *testing.T) {
 	tf.UnitTest(t)
 
 	a := NewAttoFILFromFIL(123)
-	assert.IsType(t, &AttoFIL{}, a)
+	assert.IsType(t, AttoFIL{}, a)
 
 	ab := a.Bytes()
 	b := NewAttoFILFromBytes(ab)
@@ -169,7 +169,7 @@ func TestMulInt(t *testing.T) {
 
 	t.Run("correctly multiplies the values and returns an AttoFIL", func(t *testing.T) {
 		expected := AttoFIL{val: big.NewInt(25000)}
-		assert.Equal(t, attoFIL.MulBigInt(multiplier), &expected)
+		assert.Equal(t, attoFIL.MulBigInt(multiplier), expected)
 	})
 }
 
@@ -306,11 +306,11 @@ func TestAttoFILIsPositive(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	var np *AttoFIL
+	//var np *AttoFIL
 
 	t.Run("returns false if zero", func(t *testing.T) {
 		assert.False(t, z.IsPositive())
-		assert.False(t, np.IsPositive())
+		//assert.False(t, np.IsPositive())
 	})
 
 	t.Run("returns true if greater than zero", func(t *testing.T) {
@@ -328,11 +328,11 @@ func TestAttoFILIsNegative(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	var np *AttoFIL
+	//var np *AttoFIL
 
 	t.Run("returns false if zero", func(t *testing.T) {
 		assert.False(t, z.IsNegative())
-		assert.False(t, np.IsNegative())
+		//assert.False(t, np.IsNegative())
 	})
 
 	t.Run("returns false if greater than zero", func(t *testing.T) {
@@ -350,11 +350,11 @@ func TestAttoFILIsZero(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	var np *AttoFIL
+	//var np *AttoFIL
 
 	t.Run("returns true if zero token", func(t *testing.T) {
 		assert.True(t, z.IsZero())
-		assert.True(t, np.IsZero())
+		//assert.True(t, np.IsZero())
 	})
 
 	t.Run("returns false if greater than zero token", func(t *testing.T) {

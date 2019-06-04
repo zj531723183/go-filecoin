@@ -42,12 +42,12 @@ type Message struct {
 }
 
 // NewMessage creates a new message.
-func NewMessage(from, to address.Address, nonce uint64, value *AttoFIL, method string, params []byte) *Message {
+func NewMessage(from, to address.Address, nonce uint64, value AttoFIL, method string, params []byte) *Message {
 	return &Message{
 		From:   from,
 		To:     to,
 		Nonce:  Uint64(nonce),
-		Value:  value,
+		Value:  &value,
 		Method: method,
 		Params: params,
 	}
@@ -103,7 +103,7 @@ func (msg *Message) Equals(other *Message) bool {
 	return msg.To == other.To &&
 		msg.From == other.From &&
 		msg.Nonce == other.Nonce &&
-		msg.Value.Equal(other.Value) &&
+		msg.Value.Equal(*other.Value) &&
 		msg.Method == other.Method &&
 		bytes.Equal(msg.Params, other.Params)
 }
