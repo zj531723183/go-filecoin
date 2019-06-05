@@ -57,8 +57,8 @@ func TestZeroAttoFIL(t *testing.T) {
 	z := NewAttoFILFromFIL(0)
 
 	assert.Equal(t, z, ZeroAttoFIL)
-	//assert.True(t, z.Equal(nil))
-	//assert.True(t, ZeroAttoFIL.Equal(nil))
+	assert.True(t, z.Equal(AttoFIL{}))
+	assert.True(t, ZeroAttoFIL.Equal(AttoFIL{}))
 }
 
 func TestAttoFILComparison(t *testing.T) {
@@ -83,17 +83,17 @@ func TestAttoFILComparison(t *testing.T) {
 		assert.True(t, a.LessEqual(b))
 	})
 
-	//t.Run("treats nil pointers as zero", func(t *testing.T) {
-	//	d := ZeroAttoFIL.Sub(a)
-	//	var np *AttoFIL
-	//
-	//	assert.True(t, np.Equal(ZeroAttoFIL))
-	//	assert.True(t, ZeroAttoFIL.Equal(np))
-	//	assert.True(t, d.LessThan(np))
-	//	assert.True(t, np.GreaterThan(d))
-	//	assert.True(t, c.GreaterThan(np))
-	//	assert.True(t, np.LessThan(c))
-	//})
+	t.Run("treats zero values as zero", func(t *testing.T) {
+		d := ZeroAttoFIL.Sub(a)
+		var zeroValue AttoFIL
+
+		assert.True(t, zeroValue.Equal(ZeroAttoFIL))
+		assert.True(t, ZeroAttoFIL.Equal(zeroValue))
+		assert.True(t, d.LessThan(zeroValue))
+		assert.True(t, zeroValue.GreaterThan(d))
+		assert.True(t, c.GreaterThan(zeroValue))
+		assert.True(t, zeroValue.LessThan(c))
+	})
 }
 
 func TestAttoFILAddition(t *testing.T) {
@@ -118,15 +118,15 @@ func TestAttoFILAddition(t *testing.T) {
 		assert.Equal(t, bStr, b.String())
 	})
 
-	//t.Run("treats nil pointers as zero", func(t *testing.T) {
-	//	var x, z *AttoFIL
-	//
-	//	assert.True(t, z.Add(a).Equal(a))
-	//	assert.True(t, a.Add(z).Equal(a))
-	//	assert.True(t, a.Add(nil).Equal(a))
-	//	assert.True(t, z.Add(x).Equal(nil))
-	//	assert.True(t, z.Add(nil).Equal(x))
-	//})
+	t.Run("treats zero values as zero", func(t *testing.T) {
+		var x, z AttoFIL
+
+		assert.True(t, z.Add(a).Equal(a))
+		assert.True(t, a.Add(z).Equal(a))
+		assert.True(t, a.Add(AttoFIL{}).Equal(a))
+		assert.True(t, z.Add(x).Equal(AttoFIL{}))
+		assert.True(t, z.Add(AttoFIL{}).Equal(x))
+	})
 }
 
 func TestAttoFILSubtraction(t *testing.T) {
@@ -151,14 +151,14 @@ func TestAttoFILSubtraction(t *testing.T) {
 		assert.Equal(t, bStr, b.String())
 	})
 
-	//t.Run("treats nil pointers as zero", func(t *testing.T) {
-	//	var z *AttoFIL
-	//
-	//	assert.True(t, a.Sub(z).Equal(a))
-	//	assert.True(t, a.Sub(nil).Equal(a))
-	//	assert.True(t, z.Sub(z).Equal(z))
-	//	assert.True(t, z.Sub(nil).Equal(nil))
-	//})
+	t.Run("treats zero values as zero", func(t *testing.T) {
+		var z AttoFIL
+
+		assert.True(t, a.Sub(z).Equal(a))
+		assert.True(t, a.Sub(AttoFIL{}).Equal(a))
+		assert.True(t, z.Sub(z).Equal(z))
+		assert.True(t, z.Sub(AttoFIL{}).Equal(AttoFIL{}))
+	})
 }
 
 func TestMulInt(t *testing.T) {
@@ -211,15 +211,15 @@ func TestPriceCalculation(t *testing.T) {
 		assert.Equal(t, numBytesStr, numBytes.String())
 	})
 
-	//t.Run("treats nil pointers as zero", func(t *testing.T) {
-	//	var nt *AttoFIL
-	//	var nb *BytesAmount
-	//
-	//	assert.Equal(t, price.CalculatePrice(nil), ZeroAttoFIL)
-	//	assert.Equal(t, nt.CalculatePrice(numBytes), ZeroAttoFIL)
-	//	assert.Equal(t, price.CalculatePrice(nb), ZeroAttoFIL)
-	//	assert.Equal(t, nt.CalculatePrice(nb), ZeroAttoFIL)
-	//})
+	t.Run("treats zero values as zero", func(t *testing.T) {
+		var nt AttoFIL
+		var nb *BytesAmount
+
+		assert.Equal(t, price.CalculatePrice(nil), ZeroAttoFIL)
+		assert.Equal(t, nt.CalculatePrice(numBytes), ZeroAttoFIL)
+		assert.Equal(t, price.CalculatePrice(nb), ZeroAttoFIL)
+		assert.Equal(t, nt.CalculatePrice(nb), ZeroAttoFIL)
+	})
 }
 
 func TestAttoFILCborMarshaling(t *testing.T) {
@@ -306,11 +306,11 @@ func TestAttoFILIsPositive(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	//var np *AttoFIL
+	var zeroValue AttoFIL
 
 	t.Run("returns false if zero", func(t *testing.T) {
 		assert.False(t, z.IsPositive())
-		//assert.False(t, np.IsPositive())
+		assert.False(t, zeroValue.IsPositive())
 	})
 
 	t.Run("returns true if greater than zero", func(t *testing.T) {
@@ -328,11 +328,11 @@ func TestAttoFILIsNegative(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	//var np *AttoFIL
+	var zeroValue AttoFIL
 
 	t.Run("returns false if zero", func(t *testing.T) {
 		assert.False(t, z.IsNegative())
-		//assert.False(t, np.IsNegative())
+		assert.False(t, zeroValue.IsNegative())
 	})
 
 	t.Run("returns false if greater than zero", func(t *testing.T) {
@@ -350,11 +350,11 @@ func TestAttoFILIsZero(t *testing.T) {
 	p := NewAttoFILFromFIL(100)      // positive
 	z := NewAttoFILFromFIL(0)        // zero
 	n := NewAttoFILFromFIL(0).Sub(p) // negative
-	//var np *AttoFIL
+	var zeroValue AttoFIL
 
 	t.Run("returns true if zero token", func(t *testing.T) {
 		assert.True(t, z.IsZero())
-		//assert.True(t, np.IsZero())
+		assert.True(t, zeroValue.IsZero())
 	})
 
 	t.Run("returns false if greater than zero token", func(t *testing.T) {

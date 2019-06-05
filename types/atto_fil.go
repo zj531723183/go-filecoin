@@ -22,6 +22,7 @@ func init() {
 
 var attoPower = 18
 var tenToTheEighteen = big.NewInt(10).Exp(big.NewInt(10), big.NewInt(18), nil)
+var zero big.Int
 
 // ZeroAttoFIL represents an AttoFIL quantity of 0
 var ZeroAttoFIL AttoFIL
@@ -29,11 +30,11 @@ var ZeroAttoFIL AttoFIL
 // ensureZeroAmounts takes a variable number of refs -- variables holding *AttoFIL --
 // and sets their values to the ZeroAttoFIL (the zero value for the type) if their values are nil.
 func ensureZeroAmounts(refs ...*AttoFIL) {
-	//for _, ref := range refs {
-	//	if *ref == nil {
-	//		*ref = ZeroAttoFIL
-	//	}
-	//}
+	for _, ref := range refs {
+		if ref.val == nil {
+			ref.val = &zero
+		}
+	}
 }
 
 var attoFILAtlasEntry = atlas.BuildEntry(AttoFIL{}).Transform().
