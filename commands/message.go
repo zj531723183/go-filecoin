@@ -71,7 +71,7 @@ var msgSendCmd = &cmds.Command{
 			return errors.New("mal-formed value")
 		}
 
-		fromAddr, err := fromAddr(req, env)
+		fromAddr, err := fromAddrOrDefault(req, env)
 		if err != nil {
 			return err
 		}

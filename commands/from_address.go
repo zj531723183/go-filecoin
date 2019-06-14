@@ -6,7 +6,7 @@ import (
 	"github.com/filecoin-project/go-filecoin/address"
 )
 
-func fromAddr(req *cmds.Request, env cmds.Environment) (address.Address, error) {
+func fromAddrOrDefault(req *cmds.Request, env cmds.Environment) (address.Address, error) {
 	addr, err := optionalAddr(req.Options["from"])
 	if err != nil {
 		return address.Undef, err
