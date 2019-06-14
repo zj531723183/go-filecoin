@@ -84,7 +84,7 @@ additional sectors.`,
 			return fmt.Errorf("unsupported sector size: %s (supported sizes: %s)", sectorSize, strings.Join(supportedStrs, ", "))
 		}
 
-		fromAddr, err := optionalAddr(req.Options["from"])
+		fromAddr, err := fromAddr(req, env)
 		if err != nil {
 			return err
 		}
@@ -190,7 +190,7 @@ This command waits for the ask to be mined.`,
 			return ErrInvalidPrice
 		}
 
-		fromAddr, err := optionalAddr(req.Options["from"])
+		fromAddr, err := fromAddr(req, env)
 		if err != nil {
 			return err
 		}
@@ -298,7 +298,7 @@ var minerUpdatePeerIDCmd = &cmds.Command{
 			return err
 		}
 
-		fromAddr, err := optionalAddr(req.Options["from"])
+		fromAddr, err := fromAddr(req, env)
 		if err != nil {
 			return err
 		}
