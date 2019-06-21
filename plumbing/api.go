@@ -29,7 +29,9 @@ import (
 	"github.com/filecoin-project/go-filecoin/plumbing/cst"
 	"github.com/filecoin-project/go-filecoin/plumbing/dag"
 	"github.com/filecoin-project/go-filecoin/plumbing/msg"
+	proofsPlumbing "github.com/filecoin-project/go-filecoin/plumbing/proofs"
 	"github.com/filecoin-project/go-filecoin/plumbing/strgdls"
+	"github.com/filecoin-project/go-filecoin/proofs"
 	"github.com/filecoin-project/go-filecoin/protocol/storage/storagedeal"
 	"github.com/filecoin-project/go-filecoin/state"
 	"github.com/filecoin-project/go-filecoin/types"
@@ -55,6 +57,7 @@ type API struct {
 	msgWaiter    *msg.Waiter
 	network      *net.Network
 	outbox       *core.Outbox
+	proofs       *proofsPlumbing.Proofs
 	storagedeals *strgdls.Store
 	wallet       *wallet.Wallet
 }
@@ -73,6 +76,7 @@ type APIDeps struct {
 	MsgWaiter    *msg.Waiter
 	Network      *net.Network
 	Outbox       *core.Outbox
+	Proofs       *proofsPlumbing.Proofs
 	Wallet       *wallet.Wallet
 }
 
@@ -92,6 +96,7 @@ func New(deps *APIDeps) *API {
 		msgWaiter:    deps.MsgWaiter,
 		network:      deps.Network,
 		outbox:       deps.Outbox,
+		proofs:       deps.Proofs,
 		storagedeals: deps.Deals,
 		wallet:       deps.Wallet,
 	}
@@ -349,4 +354,9 @@ func (api *API) DAGImportData(ctx context.Context, data io.Reader) (ipld.Node, e
 // BitswapGetStats returns bitswaps stats.
 func (api *API) BitswapGetStats(ctx context.Context) (*bitswap.Stat, error) {
 	return api.bitswap.(*bitswap.Bitswap).Stat()
+}
+
+// CalculatePost calls the sector builder to compute a proof.
+func (api *API) CalculatePost(sortedCommRs proofs.SortedCommRs, seed types.PoStChallengeSeed) ([]types.PoStProof, []uint64, error) {
+	return api.proofs.CalculatePost(sortedCommRs, seed)
 }

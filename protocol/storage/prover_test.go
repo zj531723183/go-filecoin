@@ -15,8 +15,6 @@ import (
 	"github.com/filecoin-project/go-filecoin/types"
 )
 
-var zeroSeed types.PoStChallengeSeed
-
 func TestProver(t *testing.T) {
 	ctx := context.Background()
 	makeAddress := address.NewForTestGetter()
@@ -24,8 +22,7 @@ func TestProver(t *testing.T) {
 	workerAddress := makeAddress()
 	sectorSize := types.OneKiBSectorSize
 
-	var fakeSeed types.PoStChallengeSeed
-	fakeSeed[0] = 1
+	fakeSeed := []byte{1, 2, 3, 4}
 	var fakeInputs []storage.PoStInputs
 	start := types.NewBlockHeight(100)
 	end := types.NewBlockHeight(200)
@@ -114,7 +111,7 @@ func TestProver(t *testing.T) {
 
 	t.Run("fails without challenge seed", func(t *testing.T) {
 		pc := makeProofContext()
-		pc.seed = zeroSeed
+		pc.seed = nil
 
 		prover := storage.NewProver(actorAddress, workerAddress, sectorSize, pc, pc)
 		_, e := prover.CalculatePoSt(ctx, start, end, fakeInputs)
@@ -124,7 +121,7 @@ func TestProver(t *testing.T) {
 
 type fakeProverContext struct {
 	height        *types.BlockHeight
-	seed          types.PoStChallengeSeed
+	seed          []byte
 	actorAddress  address.Address
 	workerAddress address.Address
 	collateral    types.AttoFIL
@@ -133,21 +130,21 @@ type fakeProverContext struct {
 	faults        []uint64
 }
 
-func (f *fakeProverContext) ChainHeight() (*types.BlockHeight, error) {
+func (f *fakeProverContext) ChainBlockHeight() (*types.BlockHeight, error) {
 	if f.height != nil {
 		return f.height, nil
 	}
 	return nil, errors.New("no height")
 }
 
-func (f *fakeProverContext) ChallengeSeed(ctx context.Context, periodStart *types.BlockHeight) (types.PoStChallengeSeed, error) {
-	if f.seed != zeroSeed {
+func (f *fakeProverContext) ChainSampleRandomness(ctx context.Context, periodStart *types.BlockHeight) ([]byte, error) {
+	if f.seed != nil {
 		return f.seed, nil
 	}
-	return zeroSeed, errors.New("no seed")
+	return nil, errors.New("no seed")
 }
 
-func (f *fakeProverContext) PledgeCollateralRequirement(ctx context.Context, addr address.Address) (types.AttoFIL, error) {
+func (f *fakeProverContext) MinerGetPledgeCollateralRequirement(ctx context.Context, addr address.Address) (types.AttoFIL, error) {
 	if addr == f.actorAddress && !f.collateral.IsZero() {
 		return f.collateral, nil
 	}
