@@ -117,6 +117,23 @@ func TestAskFunctions(t *testing.T) {
 	assert.Len(t, askids, 2)
 }
 
+func TestGetWorker(t *testing.T) {
+	tf.UnitTest(t)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	st, vms := core.CreateStorages(ctx, t)
+
+	minerAddr := createTestMiner(t, st, vms, address.TestAddress, th.RequireRandomPeerID(t))
+
+	// retrieve worker
+	result := callQueryMethodSuccess("getWorker", ctx, t, st, vms, address.TestAddress, minerAddr)
+	addr := mustDeserializeAddress(t, result)
+
+	assert.Equal(t, address.TestAddress, addr)
+}
+
 func TestChangeWorker(t *testing.T) {
 	tf.UnitTest(t)
 
@@ -130,12 +147,7 @@ func TestChangeWorker(t *testing.T) {
 
 		// retrieve worker before changing it
 		result := callQueryMethodSuccess("getWorker", ctx, t, st, vms, address.TestAddress, minerAddr)
-
-		addrValue, err := abi.Deserialize(result[0], abi.Address)
-		require.NoError(t, err)
-
-		addr, ok := addrValue.Val.(address.Address)
-		require.True(t, ok)
+		addr := mustDeserializeAddress(t, result)
 
 		assert.Equal(t, address.TestAddress, addr)
 
@@ -143,19 +155,20 @@ func TestChangeWorker(t *testing.T) {
 		pdata := actor.MustConvertParams(address.TestAddress2)
 		msg := types.NewMessage(address.TestAddress, minerAddr, 1, types.ZeroAttoFIL, "changeWorker", pdata)
 
-		_, err = th.ApplyTestMessage(st, vms, msg, types.NewBlockHeight(1))
+		_, err := th.ApplyTestMessage(st, vms, msg, types.NewBlockHeight(1))
 		assert.NoError(t, err)
 
 		// retrieve worker
 		result = callQueryMethodSuccess("getWorker", ctx, t, st, vms, address.TestAddress, minerAddr)
-
-		addrValue, err = abi.Deserialize(result[0], abi.Address)
-		require.NoError(t, err)
-
-		addr, ok = addrValue.Val.(address.Address)
-		require.True(t, ok)
+		addr = mustDeserializeAddress(t, result)
 
 		assert.Equal(t, address.TestAddress2, addr)
+
+		// ensure owner is not also changed
+		result = callQueryMethodSuccess("getOwner", ctx, t, st, vms, address.TestAddress, minerAddr)
+		addr = mustDeserializeAddress(t, result)
+
+		assert.Equal(t, address.TestAddress, addr)
 	})
 
 	t.Run("Only owner can change address", func(t *testing.T) {
@@ -172,28 +185,6 @@ func TestChangeWorker(t *testing.T) {
 		assert.Contains(t, result.ExecutionError.Error(), "not authorized")
 		assert.Equal(t, uint8(ErrCallerUnauthorized), result.Receipt.ExitCode)
 	})
-}
-
-func TestGetWorker(t *testing.T) {
-	tf.UnitTest(t)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	st, vms := core.CreateStorages(ctx, t)
-
-	minerAddr := createTestMiner(t, st, vms, address.TestAddress, th.RequireRandomPeerID(t))
-
-	// retrieve worker
-	result := callQueryMethodSuccess("getWorker", ctx, t, st, vms, address.TestAddress, minerAddr)
-
-	addrValue, err := abi.Deserialize(result[0], abi.Address)
-	require.NoError(t, err)
-
-	addr, ok := addrValue.Val.(address.Address)
-	require.True(t, ok)
-
-	assert.Equal(t, address.TestAddress, addr)
 }
 
 func TestGetOwner(t *testing.T) {
@@ -727,6 +718,16 @@ func TestLatePoStFee(t *testing.T) {
 		assert.True(t, pledgeCollateral.Equal(LatePoStFee(pledgeCollateral, bh(1000), bh(1100), bh(100))))
 		assert.True(t, pledgeCollateral.Equal(LatePoStFee(pledgeCollateral, bh(1000), bh(2000), bh(100))))
 	})
+}
+
+func mustDeserializeAddress(t *testing.T, result [][]byte) address.Address {
+	addrValue, err := abi.Deserialize(result[0], abi.Address)
+	require.NoError(t, err)
+
+	addr, ok := addrValue.Val.(address.Address)
+	require.True(t, ok)
+
+	return addr
 }
 
 func af(h int64) types.AttoFIL {
