@@ -37,7 +37,7 @@ func TestDealsRedeem(t *testing.T) {
 	t.Skipf("Flaky and slow: #2960, #2965")
 	tf.IntegrationTest(t)
 
-	ctx, env := fastesting.NewTestEnvironment(context.Background(), t, fast.FilecoinDefaultOpts)
+	ctx, env := fastesting.NewTestEnvironment(context.Background(), t, fast.FilecoinOpts{})
 
 	defer func() {
 		require.NoError(t, env.Teardown(ctx))
@@ -168,6 +168,7 @@ func TestDealsList(t *testing.T) {
 func TestDealsShow(t *testing.T) {
 	tf.IntegrationTest(t)
 
+	// increase block time to give it it a chance to seal
 	opts := fast.FilecoinOpts{
 		DaemonOpts: []fast.ProcessDaemonOption{fast.POBlockTime(100 * time.Millisecond)},
 	}
@@ -235,7 +236,12 @@ func TestDealsShow(t *testing.T) {
 func TestDealsShowPaymentVouchers(t *testing.T) {
 	tf.IntegrationTest(t)
 
-	ctx, env := fastesting.NewTestEnvironment(context.Background(), t, fast.FilecoinDefaultOpts)
+	// increase block time to give it it a chance to seal
+	opts := fast.FilecoinOpts{
+		DaemonOpts: []fast.ProcessDaemonOption{fast.POBlockTime(100 * time.Millisecond)},
+	}
+
+	ctx, env := fastesting.NewTestEnvironment(context.Background(), t, opts)
 	// Teardown after test ends
 	defer func() {
 		require.NoError(t, env.Teardown(ctx))
