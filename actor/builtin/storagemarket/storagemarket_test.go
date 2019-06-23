@@ -108,6 +108,39 @@ func TestProofsMode(t *testing.T) {
 	assert.Equal(t, types.TestProofsMode, proofsMode)
 }
 
+/*func TestUpdateStorage(t *testing.T) {
+	tf.UnitTest(t)
+
+	ctx := context.Background()
+	t.Run("add storage power", func(t *testing.T) {
+
+		st, vms := core.CreateStorages(ctx, t)
+
+		// TODO export createTestMinerWith from miner_test package to testhelpers package to make all this easier
+		// TODO then rewrite the above in terms of createTestMinerWith
+		// TODO move CreateStorages from core to testhelpers
+		pid := th.RequireRandomPeerID(t)
+		pdata := actor.MustConvertParams(types.OneKiBSectorSize, pid)
+		msg := types.NewMessage(address.TestAddress, address.StorageMarketAddress, 0, types.NewAttoFILFromFIL(100), "createStorageMiner", pdata)
+		result, err := th.ApplyTestMessage(st, vms, msg, types.NewBlockHeight(0))
+		require.NoError(t, err)
+		require.Nil(t, result.ExecutionError)
+
+		outAddr, err := address.NewFromBytes(result.Receipt.Return[0])
+		require.NoError(t, err)
+
+		minerActor, err := st.GetActor(ctx, outAddr)
+		require.NoError(t, err)
+
+		storageMkt, err := st.GetActor(ctx, address.StorageMarketAddress)
+		require.NoError(t, err)
+	})
+
+	t.Run("remove storage power", func(t *testing.T) {
+
+	})
+}*/
+
 // this is used to simulate an attack where someone derives the likely address of another miner's
 // minerActor and sends some FIL. If that FIL creates an actor tha cannot be upgraded to a miner
 // actor, this action will block the other user. Another possibility is that the miner actor will
