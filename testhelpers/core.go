@@ -16,6 +16,7 @@ import (
 	"github.com/filecoin-project/go-filecoin/actor/builtin/account"
 	"github.com/filecoin-project/go-filecoin/actor/builtin/miner"
 	"github.com/filecoin-project/go-filecoin/address"
+	"github.com/filecoin-project/go-filecoin/consensus"
 	"github.com/filecoin-project/go-filecoin/state"
 	"github.com/filecoin-project/go-filecoin/types"
 	"github.com/filecoin-project/go-filecoin/vm"
@@ -166,4 +167,20 @@ func RequireGetNonce(t *testing.T, st state.Tree, a address.Address) uint64 {
 	nonce, err := actor.NextNonce(actr)
 	require.NoError(t, err)
 	return nonce
+}
+
+// RequireCreateStorages creates an empty state tree and storage map.
+func RequireCreateStorages(ctx context.Context, t *testing.T) (state.Tree, vm.StorageMap) {
+	cst := hamt.NewCborStore()
+	d := datastore.NewMapDatastore()
+	bs := blockstore.NewBlockstore(d)
+	blk, err := consensus.DefaultGenesis(cst, bs)
+	require.NoError(t, err)
+
+	st, err := state.LoadStateTree(ctx, cst, blk.StateRoot, builtin.Actors)
+	require.NoError(t, err)
+
+	vms := vm.NewStorageMap(bs)
+
+	return st, vms
 }
